@@ -2,3 +2,4 @@
 resize.sh
 build.hxml
 *.js
+.*
