@@ -91,9 +91,6 @@ class Image {
 				if (xPos < 0) xPos = 0;
 				if (yPos < 0) yPos = 0;
 
-				xPos = Math.round(xPos * sizeRatio);
-				yPos = Math.round(yPos * sizeRatio);
-
 				#if php
 				if (options.engine.match(Engine.GD))
 					try {
@@ -131,6 +128,9 @@ class Image {
 						return Future.sync(Failure(e));
 					}
 				#end
+
+				xPos = Math.round(xPos * sizeRatio);
+				yPos = Math.round(yPos * sizeRatio);
 
 				var cmd = switch options.engine {
 					case Engine.Vips: 'vipsthumbnail';
