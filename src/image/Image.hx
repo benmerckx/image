@@ -108,7 +108,7 @@ class Image {
 						}
 						untyped __call__('imagecopyresampled', dst, src, 0, 0, xPos, yPos, options.width, options.height, cropW, cropH);
 						untyped __call__('imagedestroy', src);
-						switch outputPath.ext {
+						switch outputPath.ext.toLowerCase() {
 							case 'gif':
 								untyped __call__('imagegif', dst, output);
 							case 'jpg' | 'jpeg':
