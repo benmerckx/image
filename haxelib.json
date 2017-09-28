@@ -4,7 +4,7 @@
   "license": "MIT",
   "tags": ["cross", "utility", "web"],
   "description": "Cross platform image manipulation",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "releasenote": "Beta",
   "contributors": ["benmerckx"],
   "classPath": "src",
