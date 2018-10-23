@@ -1,3 +1,4 @@
+
 package image;
 
 import haxe.io.Bytes;
@@ -91,7 +92,7 @@ class Image {
 				if (xPos < 0) xPos = 0;
 				if (yPos < 0) yPos = 0;
 
-				#if php
+				#if (php && haxe_ver<4.0)
 				if (options.engine.match(Engine.GD))
 					try {
 						var createFrom = 'imagecreatefrom'+info.format;
@@ -123,6 +124,45 @@ class Image {
 
 						}
 						untyped __call__('imagedestroy', dst);
+						return Future.sync(Success(Noise));
+					} catch (e: Dynamic) {
+						return Future.sync(Failure(e));
+					}
+				#end
+
+				#if (php && haxe_ver>=4.0)
+				if (options.engine.match(Engine.GD))
+					try {
+						var createFrom = 'imagecreatefrom'+info.format;
+						var src = php.Syntax.code("$createFrom($input)");
+						var dst = Gd.imagecreatetruecolor( options.width, options.height);
+						//var dst = php.Syntax.call(this,'imagecreatetruecolor', options.width, options.height);
+						var outputPath = new Path(output);
+						if (outputPath.ext == 'png') {
+							php.Syntax.code("if (function_exists('imagecolorallocatealpha')) {
+								imagealphablending($dst, false);
+								imagesavealpha($dst, true);
+								$transparent = imagecolorallocatealpha($dst, 255, 255, 255, 127);
+								imagefilledrectangle($dst, 0, 0, $options->width, $options->height, $transparent);
+							}");
+						}
+						Gd.imagecopyresampled( dst, src, 0, 0, xPos, yPos, options.width, options.height, cropW, cropH);
+						Gd.imagedestroy( src);
+						switch outputPath.ext.toLowerCase() {
+							case 'gif':
+									Gd.imagegif( dst, output);
+							case 'jpg' | 'jpeg':
+									Gd.imagejpeg( dst, output, 96);
+							case 'png':
+									Gd.imagepng( dst, output, 9);
+							case 'bmp':
+									Gd.imagewbmp( dst, output);
+							default:
+								var outFunc = 'image'+outputPath.ext;
+								php.Syntax.code("$outFunc($dst, $output)");
+
+						}
+						Gd.imagedestroy(dst);
 						return Future.sync(Success(Noise));
 					} catch (e: Dynamic) {
 						return Future.sync(Failure(e));
@@ -205,6 +245,7 @@ class Image {
 	}
 
 	public static function getInfo(path: String): Surprise<ImageInfo, Error> {
+        trace( "getInfo");
 		var trigger = Future.trigger(),
 			width = 0,
 			height = 0,
@@ -212,7 +253,7 @@ class Image {
 			unsupported = 'Unsupported image format';
 
 		return
-		File.read(path) >>
+		File.read(path).map(
 		function (res: Outcome<FileInput, Error>) switch res {
 			case Success(input):
 				switch input.readUInt16() {
@@ -314,6 +355,19 @@ class Image {
 
 			case Failure(e):
 				return Failure(e);
-		}
+		});
 	}
 }
+
+#if (haxe_ver >=4.0)
+@:phpGlobal
+extern class Gd{
+	public static function imagecreatetruecolor(w:Int,h:Int):Dynamic;
+	public static function imagecopyresampled(dst_image:Dynamic , src_image:Dynamic , dst_x:Int , $dst_y:Int ,src_x:Int ,src_y:Int , dst_w:Int , dst_h:Int , src_w:Int , src_h:Int):Bool;
+	public static function imagedestroy(_image:Dynamic ):Bool;
+	public static function imagegif (  _image:Dynamic,?_to:Dynamic ):Bool;
+	public static function imagejpeg (  _image:Dynamic,?_to:Dynamic,?quality:Int ):Bool;
+	public static function imagepng (  _image:Dynamic,?_to:Dynamic,?quality:Int  ):Bool;
+	public static function imagewbmp (  _image:Dynamic,?_to:Dynamic ):Bool;
+}
+#end 
