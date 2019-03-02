@@ -1,0 +1,4 @@
+tests.hxml
+-lib hxnodejs
+-js bin/test.js
+-cmd node bin/test.js

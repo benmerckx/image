@@ -44,7 +44,7 @@ typedef ImageInfo = {
 
 class Image {
 
-	public static function resize(input: String, output: String, options: Options): Surprise<Noise, Error> {
+	public static function resize(input: String, output: String, options: Options): Promise<Noise> {
 		if (options.crop == null) options.crop = true;
 		if (options.focus == null) options.focus = {x: .5, y: .5};
 
@@ -59,211 +59,131 @@ class Image {
 			xPos = 0,
 			yPos = 0;
 
-		return
-		getInfo(input).flatMap(
-		function (res: Outcome<ImageInfo, Error>) return switch res {
-			case Success(i):
-				info = i;
-				ratio = info.width / info.height;
-				newRatio = options.width / options.height;
+		return getInfo(input).next(function (res: ImageInfo): Promise<Noise> {
+			info = res;
+			ratio = info.width / info.height;
+			newRatio = options.width / options.height;
 
-				// Compare ratios
-				if (ratio > newRatio) {
-					// Original image is wider
-					height = options.height;
-					width = Math.round(options.height * ratio);
-					cropH = info.height;
-					cropW = Math.round(info.width / width * options.width);
-					sizeRatio = options.height / info.height;
-				} else {
-					// Equal width or smaller
-					height = Math.round(options.width / ratio);
-					width = options.width;
-					cropW = info.width;
-					cropH = Math.round(info.height / height * options.height);
-					sizeRatio = options.width / info.width;
-				}
+			// Compare ratios
+			if (ratio > newRatio) {
+				// Original image is wider
+				height = options.height;
+				width = Math.round(options.height * ratio);
+				cropH = info.height;
+				cropW = Math.round(info.width / width * options.width);
+				sizeRatio = options.height / info.height;
+			} else {
+				// Equal width or smaller
+				height = Math.round(options.width / ratio);
+				width = options.width;
+				cropW = info.width;
+				cropH = Math.round(info.height / height * options.height);
+				sizeRatio = options.width / info.width;
+			}
 
-				xPos = Math.round((options.focus.x * info.width) - (cropW / 2));
-				yPos = Math.round((options.focus.y * info.height) - (cropH / 2));
+			xPos = Math.round((options.focus.x * info.width) - (cropW / 2));
+			yPos = Math.round((options.focus.y * info.height) - (cropH / 2));
 
-				if (xPos + cropW > info.width) xPos = info.width - cropW;
-				if (yPos + cropH > info.height) yPos = info.height - cropH;
-				if (xPos < 0) xPos = 0;
-				if (yPos < 0) yPos = 0;
-
-				#if (php && haxe_ver<4.0)
-				if (options.engine.match(Engine.GD))
-					try {
-						var createFrom = 'imagecreatefrom'+info.format;
-						var src = untyped __php__("$createFrom($input)");
-						var dst = untyped __call__('imagecreatetruecolor', options.width, options.height);
-						var outputPath = new Path(output);
-						if (outputPath.ext == 'png') {
-							untyped __php__("if (function_exists('imagecolorallocatealpha')) {
-								imagealphablending($dst, false);
-								imagesavealpha($dst, true);
-								$transparent = imagecolorallocatealpha($dst, 255, 255, 255, 127);
-								imagefilledrectangle($dst, 0, 0, $options->width, $options->height, $transparent);
-							}");
-						}
-						untyped __call__('imagecopyresampled', dst, src, 0, 0, xPos, yPos, options.width, options.height, cropW, cropH);
-						untyped __call__('imagedestroy', src);
-						switch outputPath.ext.toLowerCase() {
-							case 'gif':
-								untyped __call__('imagegif', dst, output);
-							case 'jpg' | 'jpeg':
-								untyped __call__('imagejpeg', dst, output, 96);
-							case 'png':
-								untyped __call__('imagepng', dst, output, 9);
-							case 'bmp':
-								untyped __call__('imagewbmp', dst, output);
-							default:
-								var outFunc = 'image'+outputPath.ext;
-								untyped __php__("$outFunc($dst, $output)");
-
-						}
-						untyped __call__('imagedestroy', dst);
-						return Future.sync(Success(Noise));
-					} catch (e: Dynamic) {
-						return Future.sync(Failure(e));
+			if (xPos + cropW > info.width) xPos = info.width - cropW;
+			if (yPos + cropH > info.height) yPos = info.height - cropH;
+			if (xPos < 0) xPos = 0;
+			if (yPos < 0) yPos = 0;
+			#if php
+			if (options.engine.match(Engine.GD))
+				try {
+					var createFrom = 'imagecreatefrom'+info.format;
+					var src = php.Syntax.code('{0}({1})', createFrom, input);
+					var dst = Gd.imagecreatetruecolor( options.width, options.height);
+					var outputPath = new Path(output);
+					if (outputPath.ext == 'png') {
+						Gd.imagealphablending(dst, false);
+						Gd.imagesavealpha(dst, true);
+						var transparent = Gd.imagecolorallocatealpha(dst, 255, 255, 255, 127);
+						Gd.imagefilledrectangle(dst, 0, 0, options.width, options.height, transparent);
 					}
-				#end
+					Gd.imagecopyresampled(dst, src, 0, 0, xPos, yPos, options.width, options.height, cropW, cropH);
+					Gd.imagedestroy(src);
+					switch outputPath.ext.toLowerCase() {
+						case 'gif':
+								Gd.imagegif(dst, output);
+						case 'jpg' | 'jpeg':
+								Gd.imagejpeg(dst, output, 96);
+						case 'png':
+								Gd.imagepng(dst, output, 9);
+						case 'bmp':
+								Gd.imagewbmp(dst, output);
+						default:
+							var outFunc = 'image'+outputPath.ext;
+							php.Syntax.code("$outFunc($dst, $output)");
 
-				#if (php && haxe_ver>=4.0)
-				
-				if (options.engine.match(Engine.GD))
-					try {
-						 var createFrom = 'imagecreatefrom'+info.format;
-						//var src = php.Syntax.code("$createFrom($input)");
-						var src =php.Syntax.code('{0}({1})',createFrom,input);
-						//var src = untyped __php__("$createFrom($input)");
-						var dst = Gd.imagecreatetruecolor( options.width, options.height);
-						//var dst = php.Syntax.call(this,'imagecreatetruecolor', options.width, options.height);
-						var outputPath = new Path(output);
-						if (outputPath.ext == 'png') {
-							php.Syntax.code("if (function_exists('imagecolorallocatealpha')) {
-								imagealphablending($dst, false);
-								imagesavealpha($dst, true);
-								$transparent = imagecolorallocatealpha($dst, 255, 255, 255, 127);
-								imagefilledrectangle($dst, 0, 0, $options->width, $options->height, $transparent);
-							}");
-						}
-						Gd.imagecopyresampled( dst, src, 0, 0, xPos, yPos, options.width, options.height, cropW, cropH);
-						Gd.imagedestroy( src);
-						switch outputPath.ext.toLowerCase() {
-							case 'gif':
-									Gd.imagegif( dst, output);
-							case 'jpg' | 'jpeg':
-									Gd.imagejpeg( dst, output, 96);
-							case 'png':
-									Gd.imagepng( dst, output, 9);
-							case 'bmp':
-									Gd.imagewbmp( dst, output);
-							default:
-								var outFunc = 'image'+outputPath.ext;
-								php.Syntax.code("$outFunc($dst, $output)");
-
-						}
-						Gd.imagedestroy(dst);
-						return Future.sync(Success(Noise));
-					} catch (e: Dynamic) {
-						return Future.sync(Failure(e));
 					}
-				#end
+					Gd.imagedestroy(dst);
+					return Noise;
+				} catch (e: Dynamic) {
+					return new Error(e);
+				}
+			#end
+			xPos = Math.round(xPos * sizeRatio);
+			yPos = Math.round(yPos * sizeRatio);
 
-				xPos = Math.round(xPos * sizeRatio);
-				yPos = Math.round(yPos * sizeRatio);
-
-				var cmd = switch options.engine {
-					case Engine.Vips: 'vipsthumbnail';
-					case Engine.ImageMagick: 'convert';
-					case Engine.GraphicsMagick: 'gm';
-					default: null;
-				}
-				var args = switch options.engine {
-					case Engine.Vips:
-						[input, '-s', '${width}x${height}', '-c', '-o', tmp];
-					case Engine.ImageMagick:
-						[input,
-							'-resize', '${width}x${height}',
-							'-crop', '${options.width}x${options.height}+${xPos}+$yPos',
-							'-strip', '+repage',
-						output];
-					case Engine.GraphicsMagick:
-						['convert', input,
-							'-resize', '${width}x${height}',
-							'-crop', '${options.width}x${options.height}+${xPos}+$yPos',
-							'-strip', '+repage',
-						output];
-					default: null;
-				}
-				var process = new Process(cmd, args);
-				process.exitCode() >>
-				function(code) return switch code {
-					case 0:
-						Success(Noise);
-					default:
-						Failure(new Error('Resize process exited with: '+code));
-				}
-			case Failure(e):
-				Future.sync(Failure(e));
-		}).flatMap(
-		function(res) return switch res {
-			case Success(_):
-				switch options.engine {
-					case Engine.Vips:
-					default:
-						return Future.sync(Success(Noise));
-				}
-
-				var process = new Process('vips',
-					['crop',
-						Path.join([path.dir, tmp]),
-						output, '$xPos', '$yPos', '${options.width}', '${options.height}'
-					]
-				);
-
-				process.exitCode() >>
-				function(code) return switch code {
-					case 0:
-						Success(Noise);
-					default:
-						Failure(new Error('Crop process exited with: '+code));
-				}
-			case Failure(e):
-				Future.sync(Failure(e));
-		}) >>
-		function(res) return switch res {
-			case Success(_):
-				switch options.engine {
-					case Engine.Vips:
-					default:
-						return Future.sync(Success(Noise));
-				}
-				FileSystem.deleteFile(Path.join([path.dir, tmp]));
-			case Failure(e):
-				Future.sync(Failure(e));
-		}
+			var cmd = switch options.engine {
+				case Engine.Vips: 'vipsthumbnail';
+				case Engine.ImageMagick: 'convert';
+				case Engine.GraphicsMagick: 'gm';
+				default: null;
+			}
+			var args = switch options.engine {
+				case Engine.Vips:
+					[input, '-s', '${width}x${height}', '-c', '-o', tmp];
+				case Engine.ImageMagick:
+					[input,
+						'-resize', '${width}x${height}',
+						'-crop', '${options.width}x${options.height}+${xPos}+$yPos',
+						'-strip', '+repage',
+					output];
+				case Engine.GraphicsMagick:
+					['convert', input,
+						'-resize', '${width}x${height}',
+						'-crop', '${options.width}x${options.height}+${xPos}+$yPos',
+						'-strip', '+repage',
+					output];
+				default: null;
+			}
+			var process = new Process(cmd, args);
+			return process.exitCode().map(function(_) return Noise);
+		}).next(function(_): Promise<Noise>
+			return switch options.engine {
+				case Engine.Vips:
+					new Process('vips',
+						['crop',
+							Path.join([path.dir, tmp]),
+							output, '$xPos', '$yPos', '${options.width}', '${options.height}'
+						]
+					).exitCode().map(function(_) return Noise);
+				default: Noise;
+			}
+		).next(function (_): Promise<Noise>
+			return switch options.engine {
+				case Engine.Vips:
+					FileSystem.deleteFile(Path.join([path.dir, tmp]));
+				default:
+					Noise;
+			}
+		);
 	}
 
-	public static function getInfo(path: String): Surprise<ImageInfo, Error> {
-        trace( "getInfo");
-		var trigger = Future.trigger(),
-			width = 0,
+	public static function getInfo(path: String): Promise<ImageInfo> {
+		var width = 0,
 			height = 0,
 			format: ImageFormat,
 			unsupported = 'Unsupported image format';
 
-		return
-		File.read(path).map(
-		function (res: Outcome<FileInput, Error>) switch res {
-			case Success(input):
+		return File.read(path).next(function (input: FileInput) {
 				switch input.readUInt16() {
 					case 0x4952:
 						input.seek(6, FileSeek.SeekCur);
 						if (input.readString(4) != 'WEBP')
-							return Failure(new Error(unsupported));
+							return new Error(unsupported);
 						format = ImageFormat.WebP;
 						switch input.readString(4) {
 							case 'VP8 ':
@@ -276,12 +196,12 @@ class Image {
 								width = 1 + (((b1 & 0x3F) << 8) | b0);
 								height = 1 + (((b3 & 0xF) << 10) | (b2 << 2) | ((b1 & 0xC0) >> 6));
 							default:
-								return Failure(new Error(unsupported));
+								return new Error(unsupported);
 						}
 					case endian if (endian == 0x4949 || endian == 0x4d4d):
 						input.bigEndian = endian == 0x4d4d;
 						if (input.readUInt16() != 42)
-							return Failure(new Error(unsupported));
+							return new Error(unsupported);
 						format = ImageFormat.Tiff;
 						var offset = input.readInt32();
 						input.seek(offset, FileSeek.SeekBegin);
@@ -347,31 +267,31 @@ class Image {
 						width = input.readUInt16();
 						height = input.readUInt16();
 					default:
-						return Failure(new Error(unsupported));
+						return new Error(unsupported);
 				}
 				input.close();
-				return Success({
+				return {
 					width: width,
 					height: height,
 					format: format
-				});
-
-			case Failure(e):
-				return Failure(e);
+				}
 		});
 	}
 }
 
-#if (haxe_ver >=4.0)
+#if php
 @:phpGlobal
 extern class Gd{
-	public static function imagecreatetruecolor(w:Int,h:Int):Dynamic;
-	public static function imagecopyresampled(dst_image:Dynamic , src_image:Dynamic , dst_x:Int , $dst_y:Int ,src_x:Int ,src_y:Int , dst_w:Int , dst_h:Int , src_w:Int , src_h:Int):Bool;
-	public static function imagedestroy(_image:Dynamic ):Bool;
-	public static function imagegif (  _image:Dynamic,?_to:Dynamic ):Bool;
-	public static function imagejpeg (  _image:Dynamic,?_to:Dynamic,?quality:Int ):Bool;
-	public static function imagepng (  _image:Dynamic,?_to:Dynamic,?quality:Int  ):Bool;
-	public static function imagewbmp (  _image:Dynamic,?_to:Dynamic ):Bool;
-	
+	public static function imagecreatetruecolor(w:Int, h:Int): Dynamic;
+	public static function imagecopyresampled(dst_image:Dynamic, src_image:Dynamic, dst_x:Int, $dst_y:Int, src_x:Int, src_y:Int, dst_w:Int, dst_h:Int, src_w:Int, src_h:Int): Bool;
+	public static function imagedestroy(_image:Dynamic): Bool;
+	public static function imagegif(_image:Dynamic,?_to:Dynamic): Bool;
+	public static function imagejpeg(_image:Dynamic,?_to:Dynamic,?quality:Int): Bool;
+	public static function imagepng(_image:Dynamic,?_to:Dynamic, ?quality:Int): Bool;
+	public static function imagewbmp(_image:Dynamic,?_to:Dynamic): Bool;
+	public static function imagealphablending(image: Dynamic, blendmode: Bool): Bool;
+	public static function imagesavealpha(image: Dynamic, saveFlag: Bool): Bool;
+	public static function imagecolorallocatealpha(image: Dynamic, red: Int, green: Int, blue: Int, alpha: Int): Int;
+	public static function imagefilledrectangle(image: Dynamic, x1: Int, y: 1: Int, x2: Int, y2: Int, color: Int): Bool;
 }
-#end 
+#end

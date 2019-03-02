@@ -1,0 +1,3 @@
+-lib tink_core
+-lib asys
+-cp ./src
