@@ -9,7 +9,7 @@ os:
   - osx
 
 install:
-  - npm i -g lix @codeurs/php-bin-linux64
+  - npm i -g lix
   - lix download
 
 script:

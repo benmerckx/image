@@ -120,7 +120,7 @@ class Image {
 					Gd.imagedestroy(dst);
 					return Noise;
 				} catch (e: Dynamic) {
-					return new Error(e);
+					return new Error('$e');
 				}
 			#end
 			xPos = Math.round(xPos * sizeRatio);
