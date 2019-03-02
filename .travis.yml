@@ -9,7 +9,8 @@ os:
 
 install:
   - sudo apt-get install -y imagemagick graphicsmagick libvips-tools
-  - npm i -g lix @codeurs/php-bin-linux64
+  - npm i -g lix
+  - npm i @codeurs/php-bin-linux64
   - lix download
 
 script:
