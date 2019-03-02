@@ -55,7 +55,7 @@ class Image {
 			width = 0, height = 0,
 			sizeRatio = .0,
 			path = new Path(input),
-			tmp = Path.join([path.dir, 'tn_'+path.file+'.'+path.ext]),
+			tmp = 'tn_'+path.file+'.'+path.ext,
 			xPos = 0,
 			yPos = 0;
 
@@ -132,6 +132,7 @@ class Image {
 				case Engine.GraphicsMagick: 'gm';
 				default: null;
 			}
+			// Todo: saving gif/bmp files is unsupported in vips
 			var args = switch options.engine {
 				case Engine.Vips:
 					[input, '-s', '${width}x${height}', '-c', '-o', tmp];
@@ -156,7 +157,7 @@ class Image {
 				case Engine.Vips:
 					new Process('vips',
 						['crop',
-							tmp,
+							Path.join([path.dir, tmp]),
 							output, '$xPos', '$yPos', '${options.width}', '${options.height}'
 						]
 					).exitCode().map(function(_) return Noise);
@@ -165,7 +166,7 @@ class Image {
 		).next(function (_): Promise<Noise>
 			return switch options.engine {
 				case Engine.Vips:
-					FileSystem.deleteFile(tmp);
+					FileSystem.deleteFile(Path.join([path.dir, tmp]));
 				default:
 					Noise;
 			}

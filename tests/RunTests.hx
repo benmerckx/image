@@ -34,27 +34,24 @@ class TestImageResize {
 			});
 	}
 
-	function testFileFormats(asserts: AssertionBuffer, engine: Engine) {
-		return Promise.inParallel([
-			resize(asserts, engine, 'jpg'),
-			resize(asserts, engine, 'png'),
-			resize(asserts, engine, 'gif'),
-			resize(asserts, engine, 'bmp')
-		]).next(_ -> asserts.done());
+	function testFileFormats(asserts: AssertionBuffer, engine: Engine, extensions: Array<String>) {
+		return Promise.inParallel(
+			extensions.map(ext -> resize(asserts, engine, ext))
+		).next(_ -> asserts.done());
 	}
 
 	public function testImageResizeVips()
-		return testFileFormats(asserts, Engine.Vips);
+		return testFileFormats(asserts, Engine.Vips, ['jpg', 'png', 'webp', 'tiff']);
 
 	public function testImageResizeImageMagick()
-		return testFileFormats(asserts, Engine.ImageMagick);
+		return testFileFormats(asserts, Engine.ImageMagick, ['jpg', 'png', 'bmp', 'gif', 'webp', 'tiff']);
 
 	public function testImageResizeGraphicsMagick()
-		return testFileFormats(asserts, Engine.GraphicsMagick);
+		return testFileFormats(asserts, Engine.GraphicsMagick, ['jpg', 'png', 'bmp', 'gif', 'webp', 'tiff']);
 
 	#if php
 	public function testImageResizeGD()
-		return testFileFormats(asserts, Engine.GD);
+		return testFileFormats(asserts, Engine.GD, ['jpg', 'png', 'bmp', 'gif', 'webp', 'tiff']);
 	#end
 
 }
@@ -91,7 +88,7 @@ class TestImageInfo {
 	}
 
 	public function testTiff() {
-		return Image.getInfo('tests/assets/sample.tif').next(info -> {
+		return Image.getInfo('tests/assets/sample.tiff').next(info -> {
 			asserts.assert(info.width == 300);
 			asserts.assert(info.height == 262);
 			asserts.assert(info.format == ImageFormat.Tiff);
