@@ -16,7 +16,7 @@ abstract ImageFormat(String) from String to String {
 	var Jpg = 'jpeg';
 	var Png = 'png';
 	var Gif = 'gif';
-	var Bmp = 'wbmp';
+	var Bmp = 'bmp';
 	var Tiff = 'tiff';
 	var WebP = 'webp';
 }
@@ -111,7 +111,7 @@ class Image {
 						case 'png':
 								Gd.imagepng(dst, output, 9);
 						case 'bmp':
-								Gd.imagewbmp(dst, output);
+								Gd.imagebmp(dst, output);
 						default:
 							var outFunc = 'image'+outputPath.ext;
 							php.Syntax.code("$outFunc($dst, $output)");
@@ -288,7 +288,7 @@ extern class Gd{
 	public static function imagegif(_image:Dynamic,?_to:Dynamic): Bool;
 	public static function imagejpeg(_image:Dynamic,?_to:Dynamic,?quality:Int): Bool;
 	public static function imagepng(_image:Dynamic,?_to:Dynamic, ?quality:Int): Bool;
-	public static function imagewbmp(_image:Dynamic,?_to:Dynamic): Bool;
+	public static function imagebmp(_image:Dynamic,?_to:Dynamic): Bool;
 	public static function imagealphablending(image: Dynamic, blendmode: Bool): Bool;
 	public static function imagesavealpha(image: Dynamic, saveFlag: Bool): Bool;
 	public static function imagecolorallocatealpha(image: Dynamic, red: Int, green: Int, blue: Int, alpha: Int): Int;
