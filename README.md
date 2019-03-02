@@ -1,11 +1,13 @@
 # image
 Cross platform image manipulation. Supports jpg, gif, png, bmp, tiff, webp.
 
+[![Build Status](https://travis-ci.org/benmerckx/image.svg?branch=master)](https://travis-ci.org/benmerckx/image)
+
 ## Info
 
 ### Image.getInfo(path)
 
-Analyzes a given file. Some of the detection code comes from [heaps](https://github.com/ncannasse/heaps). Returns a `Surprise<ImageInfo, Error>`.
+Analyzes a given file. Some of the detection code comes from [heaps](https://github.com/ncannasse/heaps). Returns a `Promise<ImageInfo>`.
 
 ```haxe
 Image.getInfo('file.jpg').handle(function (res) switch res {
@@ -38,7 +40,7 @@ enum Engine {
 
 ### Image.resize(input, output, options)
 
-Returns a `Surprise<Noise, Error>`.
+Returns a `Promise<Noise>`.
 
 Options being
 ```haxe
