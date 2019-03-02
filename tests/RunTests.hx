@@ -51,7 +51,7 @@ class TestImageResize {
 
 	#if php
 	public function testImageResizeGD()
-		return testFileFormats(asserts, Engine.GD, ['jpg', 'png', 'bmp', 'gif');
+		return testFileFormats(asserts, Engine.GD, ['jpg', 'png', 'bmp', 'gif']);
 	#end
 
 }
