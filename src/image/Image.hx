@@ -55,7 +55,7 @@ class Image {
 			width = 0, height = 0,
 			sizeRatio = .0,
 			path = new Path(input),
-			tmp = 'tn_'+path.file+'.'+path.ext,
+			tmp = Path.join([path.dir, 'tn_'+path.file+'.'+path.ext]),
 			xPos = 0,
 			yPos = 0;
 
@@ -156,7 +156,7 @@ class Image {
 				case Engine.Vips:
 					new Process('vips',
 						['crop',
-							Path.join([path.dir, tmp]),
+							tmp,
 							output, '$xPos', '$yPos', '${options.width}', '${options.height}'
 						]
 					).exitCode().map(function(_) return Noise);
@@ -165,7 +165,7 @@ class Image {
 		).next(function (_): Promise<Noise>
 			return switch options.engine {
 				case Engine.Vips:
-					FileSystem.deleteFile(Path.join([path.dir, tmp]));
+					FileSystem.deleteFile(tmp);
 				default:
 					Noise;
 			}
