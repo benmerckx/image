@@ -60,7 +60,7 @@ class Image {
 			yPos = 0;
 
 		return
-		getInfo(input) >>
+		getInfo(input).flatMap(
 		function (res: Outcome<ImageInfo, Error>) return switch res {
 			case Success(i):
 				info = i;
@@ -131,10 +131,13 @@ class Image {
 				#end
 
 				#if (php && haxe_ver>=4.0)
+				
 				if (options.engine.match(Engine.GD))
 					try {
-						var createFrom = 'imagecreatefrom'+info.format;
-						var src = php.Syntax.code("$createFrom($input)");
+						 var createFrom = 'imagecreatefrom'+info.format;
+						//var src = php.Syntax.code("$createFrom($input)");
+						var src =php.Syntax.code('{0}({1})',createFrom,input);
+						//var src = untyped __php__("$createFrom($input)");
 						var dst = Gd.imagecreatetruecolor( options.width, options.height);
 						//var dst = php.Syntax.call(this,'imagecreatetruecolor', options.width, options.height);
 						var outputPath = new Path(output);
@@ -205,7 +208,7 @@ class Image {
 				}
 			case Failure(e):
 				Future.sync(Failure(e));
-		} >>
+		}).flatMap(
 		function(res) return switch res {
 			case Success(_):
 				switch options.engine {
@@ -230,7 +233,7 @@ class Image {
 				}
 			case Failure(e):
 				Future.sync(Failure(e));
-		} >>
+		}) >>
 		function(res) return switch res {
 			case Success(_):
 				switch options.engine {
@@ -369,5 +372,6 @@ extern class Gd{
 	public static function imagejpeg (  _image:Dynamic,?_to:Dynamic,?quality:Int ):Bool;
 	public static function imagepng (  _image:Dynamic,?_to:Dynamic,?quality:Int  ):Bool;
 	public static function imagewbmp (  _image:Dynamic,?_to:Dynamic ):Bool;
+	
 }
 #end 
