@@ -9,7 +9,7 @@ os:
   - osx
 
 install:
-  - npm i -g lix
+  - npm i -g lix @codeurs/php-bin-linux64
   - lix download
 
 script:
@@ -17,9 +17,4 @@ script:
   - lix run travix neko
   - lix run travix python
   - lix run travix node
-  - lix run travix java
-  - lix run travix cpp
-  - lix run travix cs
-  - lix run travix php
   - lix run travix php7
-  - lix run travix lua

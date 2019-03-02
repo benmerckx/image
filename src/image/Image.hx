@@ -292,6 +292,6 @@ extern class Gd{
 	public static function imagealphablending(image: Dynamic, blendmode: Bool): Bool;
 	public static function imagesavealpha(image: Dynamic, saveFlag: Bool): Bool;
 	public static function imagecolorallocatealpha(image: Dynamic, red: Int, green: Int, blue: Int, alpha: Int): Int;
-	public static function imagefilledrectangle(image: Dynamic, x1: Int, y: 1: Int, x2: Int, y2: Int, color: Int): Bool;
+	public static function imagefilledrectangle(image: Dynamic, x1: Int, y1: Int, x2: Int, y2: Int, color: Int): Bool;
 }
 #end
