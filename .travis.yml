@@ -19,3 +19,7 @@ script:
   - lix run travix python
   - lix run travix node
   - lix run travix php7
+
+cache:
+  directories:
+    - $HOME/haxe
