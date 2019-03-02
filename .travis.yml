@@ -9,7 +9,7 @@ os:
 
 install:
   - sudo apt-get install -y imagemagick graphicsmagick libvips-tools
-  - npm i -g lix
+  - npm i -g lix @codeurs/php-bin-linux64
   - lix download
 
 script:
@@ -17,7 +17,7 @@ script:
   - lix run travix neko
   - lix run travix python
   - lix run travix node
-  - lix run travix php7
+  - haxe tests.hxml -php bin/php -cmd php bin/php/index.php
 
 cache:
   directories:

@@ -43,8 +43,8 @@ class TestImageResize {
 		]).next(_ -> asserts.done());
 	}
 
-	public function testImageResizeVips()
-		return testFileFormats(asserts, Engine.Vips);
+	/*public function testImageResizeVips()
+		return testFileFormats(asserts, Engine.Vips);*/
 
 	public function testImageResizeImageMagick()
 		return testFileFormats(asserts, Engine.ImageMagick);
