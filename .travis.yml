@@ -9,6 +9,7 @@ os:
   - osx
 
 install:
+  - sudo apt-get install -y imagemagick graphicsmagick libvips-tools
   - npm i -g lix
   - lix download
 
