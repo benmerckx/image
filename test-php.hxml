@@ -1,0 +1,3 @@
+tests.hxml
+-php bin/php 
+-cmd php bin/php/index.php

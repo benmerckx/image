@@ -17,7 +17,7 @@ script:
   - lix run travix neko
   - lix run travix python
   - lix run travix node
-  - haxe tests.hxml -php bin/php -cmd php "bin/php/index.php"
+  - haxe test-php.hxml
 
 cache:
   directories:
