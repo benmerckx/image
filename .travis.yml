@@ -6,7 +6,6 @@ node_js: 10
 
 os:
   - linux
-  - osx
 
 install:
   - sudo apt-get install -y imagemagick graphicsmagick libvips-tools
