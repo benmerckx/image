@@ -8,17 +8,9 @@ os:
   - linux
   - osx
 
-haxe:
-  - "3.4.7"
-  - "4.0.0-rc.1"
-  - development
-  
-matrix:
-  allow_failures:
-    - haxe: development
-
 install:
   - npm i -g lix
+  - lix download
 
 script:
   - lix run travix interp
