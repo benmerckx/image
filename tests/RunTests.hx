@@ -44,14 +44,14 @@ class TestImageResize {
 		return testFileFormats(asserts, Engine.Vips, ['jpg', 'png', 'webp', 'tiff']);
 
 	public function testImageResizeImageMagick()
-		return testFileFormats(asserts, Engine.ImageMagick, ['jpg', 'png', 'bmp', 'gif', 'webp', 'tiff']);
+		return testFileFormats(asserts, Engine.ImageMagick, ['jpg', 'png', 'bmp', 'gif', 'tiff']);
 
 	public function testImageResizeGraphicsMagick()
-		return testFileFormats(asserts, Engine.GraphicsMagick, ['jpg', 'png', 'bmp', 'gif', 'webp', 'tiff']);
+		return testFileFormats(asserts, Engine.GraphicsMagick, ['jpg', 'png', 'bmp', 'gif', 'tiff']);
 
 	#if php
 	public function testImageResizeGD()
-		return testFileFormats(asserts, Engine.GD, ['jpg', 'png', 'bmp', 'gif', 'webp', 'tiff']);
+		return testFileFormats(asserts, Engine.GD, ['jpg', 'png', 'bmp', 'gif', 'tiff']);
 	#end
 
 }

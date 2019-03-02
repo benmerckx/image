@@ -44,6 +44,10 @@ typedef ImageInfo = {
 
 class Image {
 
+	static function failOnErrorCode(code: Int): Promise<Noise> {
+		return if (code > 0) new Error('Resize failed with $code') else Noise;
+	}
+
 	public static function resize(input: String, output: String, options: Options): Promise<Noise> {
 		if (options.crop == null) options.crop = true;
 		if (options.focus == null) options.focus = {x: .5, y: .5};
@@ -151,7 +155,7 @@ class Image {
 				default: null;
 			}
 			var process = new Process(cmd, args);
-			return process.exitCode().map(function(_) return Noise);
+			return process.exitCode().flatMap(failOnErrorCode);
 		}).next(function(_): Promise<Noise>
 			return switch options.engine {
 				case Engine.Vips:
@@ -160,7 +164,7 @@ class Image {
 							Path.join([path.dir, tmp]),
 							output, '$xPos', '$yPos', '${options.width}', '${options.height}'
 						]
-					).exitCode().map(function(_) return Noise);
+					).exitCode().flatMap(failOnErrorCode);
 				default: Noise;
 			}
 		).next(function (_): Promise<Noise>
