@@ -288,7 +288,7 @@ class Image {
 @:phpGlobal
 extern class Gd{
 	public static function imagecreatetruecolor(w:Int, h:Int): Dynamic;
-	public static function imagecopyresampled(dst_image:Dynamic, src_image:Dynamic, dst_x:Int, $dst_y:Int, src_x:Int, src_y:Int, dst_w:Int, dst_h:Int, src_w:Int, src_h:Int): Bool;
+	public static function imagecopyresampled(dst_image:Dynamic, src_image:Dynamic, dst_x:Int, dst_y:Int, src_x:Int, src_y:Int, dst_w:Int, dst_h:Int, src_w:Int, src_h:Int): Bool;
 	public static function imagedestroy(_image:Dynamic): Bool;
 	public static function imagegif(_image:Dynamic,?_to:Dynamic): Bool;
 	public static function imagejpeg(_image:Dynamic,?_to:Dynamic,?quality:Int): Bool;
