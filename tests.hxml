@@ -1,5 +1,6 @@
 -cp tests
 -lib image
--lib tink_unittest
--main RunTests
+-lib helder.unit
+-main helder.Unit
+-D helder.unit.package=tests
 -dce full

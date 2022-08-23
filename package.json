@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "test": "haxe test.hxml",
+    "test:php": "haxe test-php.hxml",
+    "postinstall": "lix download",
+    "submit": "bestzip submit.zip src/* haxelib.json readme.md extraParams.hxml && haxelib submit submit.zip && rm submit.zip"
+  },
+  "devDependencies": {
+    "bestzip": "^2.2.1",
+    "lix": "^15.12.0"
+  }
+}

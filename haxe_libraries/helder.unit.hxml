@@ -1,0 +1,4 @@
+# @install: lix --silent download "gh://github.com/helder/unit#f087b072db7f835479f902430b7eabedfa774294" into helder.unit/0.0.0/github/f087b072db7f835479f902430b7eabedfa774294
+-lib deep_equal
+-cp ${HAXE_LIBCACHE}/helder.unit/0.0.0/github/f087b072db7f835479f902430b7eabedfa774294/src
+-D helder.unit=0.0.0
