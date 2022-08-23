@@ -38,7 +38,7 @@ final TestResize = suite(test -> {
 	#if cli
   testFileFormats(Engine.ImageMagick, ['jpg', 'png', 'bmp', 'gif', 'tiff']);
 	testFileFormats(Engine.GraphicsMagick, ['jpg', 'png', 'bmp', 'gif', 'tiff']);
-  testFileFormats(Engine.Vips, ['jpg', 'png', 'webp', 'tiff']);
+  testFileFormats(Engine.Vips, ['jpg', 'png', 'tiff']);
 	#end
 
 	#if php
