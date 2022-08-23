@@ -11,8 +11,7 @@ import asys.io.Process;
 
 using tink.CoreApi;
 
-@:enum
-abstract ImageFormat(String) from String to String {
+enum abstract ImageFormat(String) from String to String {
 	var Jpg = 'jpeg';
 	var Png = 'png';
 	var Gif = 'gif';
@@ -21,11 +20,11 @@ abstract ImageFormat(String) from String to String {
 	var WebP = 'webp';
 }
 
-enum Engine {
-	Vips;
-	ImageMagick;
-	GraphicsMagick;
-	GD;
+enum abstract Engine(String) to String {
+	final Vips = 'vips';
+	final ImageMagick = 'imagemagick';
+	final GraphicsMagick = 'graphicsmagick';
+	final GD = 'gd';
 }
 
 typedef Options = {
@@ -93,7 +92,7 @@ class Image {
 			if (xPos < 0) xPos = 0;
 			if (yPos < 0) yPos = 0;
 			#if php
-			if (options.engine.match(Engine.GD))
+			if (options.engine == Engine.GD)
 				try {
 					var createFrom = 'imagecreatefrom'+info.format;
 					var src = php.Syntax.code('{0}({1})', createFrom, input);
