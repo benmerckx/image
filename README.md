@@ -1,8 +1,6 @@
 # image
 Cross platform image manipulation. Supports jpg, gif, png, bmp, tiff, webp.
 
-[![Build Status](https://travis-ci.org/benmerckx/image.svg?branch=master)](https://travis-ci.org/benmerckx/image)
-
 ## Info
 
 ### Image.getInfo(path)
@@ -11,10 +9,10 @@ Analyzes a given file. Some of the detection code comes from [heaps](https://git
 
 ```haxe
 Image.getInfo('file.jpg').handle(function (res) switch res {
-	case Success(data):
-    	// {format: ImageFormat.Jpg, width: 100, height: 100}
-    case Failure(error):
-    	trace(error.message);
+  case Success(data):
+    // {format: ImageFormat.Jpg, width: 100, height: 100}
+  case Failure(error):
+    trace(error.message);
 });
 ```
 
@@ -31,10 +29,10 @@ Install any of these commandline tools and pass the corresponding engine to the 
 
 ```haxe
 enum Engine {
-	Vips;
-	ImageMagick;
-	GraphicsMagick;
-	GD;
+  Vips;
+  ImageMagick;
+  GraphicsMagick;
+  GD;
 }
 ```
 
@@ -45,22 +43,22 @@ Returns a `Promise<Noise>`.
 Options being
 ```haxe
 {
-	engine: Engine,
-	width: Int,
-	height: Int,
-	?crop: Bool, // Defaults to true
-	?focus: {x: Float, y: Float} // Defaults to {x: .5, y: .5}
+  engine: Engine,
+  width: Int,
+  height: Int,
+  ?crop: Bool, // Defaults to true
+  ?focus: {x: Float, y: Float} // Defaults to {x: .5, y: .5}
 }
 ```
 Resize and crop a file from the center:
 
 ```haxe
 Image
-.resize('file.jpg', 'thumb.jpg', {engine: Engine.Vips, width: 200, height: 200})
-.handle(function (res) switch res {
-	case Success(_):
-    	trace('Image resized!');
+  .resize('file.jpg', 'thumb.jpg', {engine: Engine.Vips, width: 200, height: 200})
+  .handle(function (res) switch res {
+    case Success(_):
+      trace('Image resized!');
     case Failure(error):
-    	trace('Something went wrong: '+error.message);
-});
+      trace('Something went wrong: '+ error.message);
+  });
 ```
