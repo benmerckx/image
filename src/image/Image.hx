@@ -32,7 +32,8 @@ typedef Options = {
 	width: Int,
 	height: Int,
 	?crop: Bool,
-	?focus: {x: Float, y: Float}
+	?focus: {x: Float, y: Float},
+	?quality: Int,
 }
 
 typedef ImageInfo = {
@@ -110,7 +111,8 @@ class Image {
 						case 'gif':
 								Gd.imagegif(dst, output);
 						case 'jpg' | 'jpeg':
-								Gd.imagejpeg(dst, output, 96);
+								final quality = if (options.quality != null) options.quality else 96;
+								Gd.imagejpeg(dst, output, quality);
 						case 'png':
 								Gd.imagepng(dst, output, 9);
 						case 'bmp':
@@ -143,14 +145,22 @@ class Image {
 					[input,
 						'-resize', '${width}x${height}',
 						'-crop', '${options.width}x${options.height}+${xPos}+$yPos',
-						'-strip', '+repage',
-					output];
+						'-strip', '+repage'
+					].concat(
+						if (options.quality != null)
+							['-quality', '${options.quality}']
+						else []
+					).concat([output]);
 				case Engine.GraphicsMagick:
 					['convert', input,
 						'-resize', '${width}x${height}',
 						'-crop', '${options.width}x${options.height}+${xPos}+$yPos',
-						'-strip', '+repage',
-					output];
+						'-strip', '+repage'
+					].concat(
+						if (options.quality != null)
+							['-quality', '${options.quality}']
+						else []
+					).concat([output]);
 				default: null;
 			}
 			var process = new Process(cmd, args);
