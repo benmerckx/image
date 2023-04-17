@@ -47,7 +47,8 @@ Options being
   width: Int,
   height: Int,
   ?crop: Bool, // Defaults to true
-  ?focus: {x: Float, y: Float} // Defaults to {x: .5, y: .5}
+  ?focus: {x: Float, y: Float}, // Defaults to {x: .5, y: .5}
+  ?quality: Int // Engine- and format-dependent
 }
 ```
 Resize and crop a file from the center:
@@ -62,3 +63,13 @@ Image
       trace('Something went wrong: '+ error.message);
   });
 ```
+
+#### Options.quality
+For GD, the quality option is only used when the output format is JPEG. If not set, the default value is 96.
+
+For ImageMagick and GraphicsMagick, this is passed as the `-quality` option into the command, only having effect for JPEG and PNG.
+If not set, the value is determined by the program (usually, the quality setting of the original image is used).
+See [ImageMagick documentation](https://imagemagick.org/script/command-line-options.php#quality)
+
+For VIPS, the option is ignored.
+
